@@ -1,4 +1,4 @@
-# amarclass
+# AmarClass
 
 A new Flutter project.
 
