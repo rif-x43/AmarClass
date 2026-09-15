@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FF),
-      resizeToAvoidBottomInset: false, // Prevents overflow when scrolling is removed
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 30,
               ),
               const SizedBox(height: 32),
-              
               const Text(
                 'Welcome Back',
                 style: TextStyle(
@@ -48,13 +47,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 48),
-              
               const _CustomTextField(
                 label: 'Institutional Email Address',
                 hint: 'partho.yag@aust.edu',
               ),
               const SizedBox(height: 20),
-              
               _CustomTextField(
                 label: 'Password',
                 hint: '••••••••',
@@ -75,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -92,7 +88,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                           activeColor: const Color(0xFF2F8DF6),
-                          side: const BorderSide(color: Colors.black26),
+                          side: BorderSide.none,
+                          fillColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return const Color(0xFF2F8DF6);
+                            }
+                            return Colors.white;
+                          }),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -127,14 +129,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 48),
-              
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
+                child: TextButton(
+                  style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF2F8DF6),
-                    elevation: 0,
                     splashFactory: NoSplash.splashFactory,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
@@ -152,17 +152,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              
+              const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
+                child: TextButton.icon(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
                     splashFactory: NoSplash.splashFactory,
-                    side: const BorderSide(color: Colors.black12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -182,6 +179,40 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onPressed: () {},
                 ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Updated Sign Up Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontFamily: 'Inter Display',
+                      fontSize: 13,
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      splashFactory: NoSplash.splashFactory,
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: () {},
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: Color(0xFF2F8DF6),
+                        fontFamily: 'Inter Display',
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -233,13 +264,13 @@ class _CustomTextField extends StatelessWidget {
               horizontal: 16,
               vertical: 14,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Colors.black12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF2F8DF6)),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF2F8DF6), width: 0.2),
             ),
           ),
         ),
