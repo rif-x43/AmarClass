@@ -1,38 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'dashboard_screen.dart';
-import 'password_recovery_screen.dart';
-import 'sign_up_screen.dart';
+import 'otp_verification_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
-  bool _rememberMe = false;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _signIn() {
-    if (_emailController.text == 'test@aust.edu' &&
-        _passwordController.text == 'test') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute<void>(builder: (_) => const DashboardScreen()),
-      );
-    }
-  }
+  bool _obscureConfirmPassword = true;
+  String _selectedRole = 'Student';
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 image: AssetImage('brandings/logo_black.png'),
                 height: 30,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 32),
               const Text(
-                'Welcome Back',
+                'Join AmarClass',
                 style: TextStyle(
                   fontFamily: 'Inter Display',
                   fontSize: 24,
@@ -62,24 +42,58 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Centralize your course modules, student rosters, and academic scheduling effortlessly.',
+                'Establish your academic profile to synchronize courses, schedules, and assessments.',
                 style: TextStyle(
                   fontFamily: 'Inter Display',
                   fontSize: 14,
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 48),
-              _CustomTextField(
+              const SizedBox(height: 36),
+              const Text(
+                'Account Type',
+                style: TextStyle(
+                  fontFamily: 'Inter Display',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _RoleButton(
+                    title: 'Student',
+                    selected: _selectedRole == 'Student',
+                    onPressed: () {
+                      setState(() => _selectedRole = 'Student');
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  _RoleButton(
+                    title: 'Faculty',
+                    selected: _selectedRole == 'Faculty',
+                    onPressed: () {
+                      setState(() => _selectedRole = 'Faculty');
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const _SignUpField(
+                label: 'Full Name',
+                hint: 'e.g. Partho Yag Paul',
+              ),
+              const SizedBox(height: 16),
+              const _SignUpField(
                 label: 'Institutional Email Address',
                 hint: 'partho.yag@aust.edu',
-                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 20),
-              _CustomTextField(
+              const SizedBox(height: 16),
+              _SignUpField(
                 label: 'Password',
                 hint: '••••••••',
-                controller: _passwordController,
                 obscureText: _obscurePassword,
                 suffixIcon: IconButton(
                   splashColor: Colors.transparent,
@@ -99,70 +113,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
-                          activeColor: const Color(0xFF2F8DF6),
-                          side: BorderSide.none,
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return const Color(0xFF2F8DF6);
-                            }
-                            return Colors.white;
-                          }),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Remember me',
-                        style: TextStyle(
-                          fontFamily: 'Inter Display',
-                          fontSize: 14,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
+              _SignUpField(
+                label: 'Confirm Password',
+                hint: '••••••••',
+                obscureText: _obscureConfirmPassword,
+                suffixIcon: IconButton(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  icon: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: Colors.black45,
+                    size: 18,
                   ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      splashFactory: NoSplash.splashFactory,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const PasswordRecoveryScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 14,
-                        color: Color(0xFF2F8DF6),
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                  ),
-                ],
+                  onPressed: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
+                ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -174,52 +146,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  onPressed: _signIn,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const OtpVerificationScreen(),
+                      ),
+                    );
+                  },
                   child: const Text(
-                    'Sign In',
+                    'Create Account',
                     style: TextStyle(
                       fontFamily: 'Inter Display',
                       fontSize: 16,
-                      fontWeight: FontWeight.normal,
                       color: Colors.white,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    splashFactory: NoSplash.splashFactory,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  icon: const Image(
-                    image: AssetImage('brandings/misc/google_icon.png'),
-                    height: 20,
-                  ),
-                  label: const Text(
-                    'Sign in with Google',
-                    style: TextStyle(
-                      fontFamily: 'Inter Display',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  onPressed: null,
-                ),
-              ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't have an account?",
+                    'Already have an account?',
                     style: TextStyle(
                       color: Colors.black54,
                       fontFamily: 'Inter Display',
@@ -233,16 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const SignUpScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () => Navigator.pop(context),
                     child: const Text(
-                      'Sign Up',
+                      'Sign In',
                       style: TextStyle(
                         color: Color(0xFF2F8DF6),
                         fontFamily: 'Inter Display',
@@ -261,18 +205,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _CustomTextField extends StatelessWidget {
+class _SignUpField extends StatelessWidget {
   final String label;
   final String hint;
-  final TextEditingController? controller;
   final bool obscureText;
+  final TextInputType keyboardType;
   final Widget? suffixIcon;
 
-  const _CustomTextField({
+  const _SignUpField({
     required this.label,
     required this.hint,
-    this.controller,
     this.obscureText = false,
+    this.keyboardType = TextInputType.text,
     this.suffixIcon,
   });
 
@@ -292,7 +236,7 @@ class _CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         TextFormField(
-          controller: controller,
+          keyboardType: keyboardType,
           obscureText: obscureText,
           style: const TextStyle(fontFamily: 'Inter Display', fontSize: 15),
           cursorColor: const Color(0xFF2F8DF6),
@@ -320,6 +264,44 @@ class _CustomTextField extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RoleButton extends StatelessWidget {
+  final String title;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  const _RoleButton({
+    required this.title,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: selected ? Colors.black87 : Colors.white,
+          splashFactory: NoSplash.splashFactory,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Inter Display',
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: selected ? Colors.white : Colors.black54,
+          ),
+        ),
+      ),
     );
   }
 }
