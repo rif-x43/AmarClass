@@ -55,6 +55,8 @@ flutter:
   assets:
     - brandings/icon.png
     - brandings/appicon_white.png
+    - brandings/logo_black.png
+    - brandings/misc/google_icon.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
