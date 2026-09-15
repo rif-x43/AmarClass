@@ -54,6 +54,7 @@ flutter:
 
   assets:
     - brandings/icon.png
+    - brandings/appicon_blue.png
     - brandings/appicon_white.png
     - brandings/logo_black.png
     - brandings/misc/google_icon.png
