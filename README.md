@@ -1,8 +1,12 @@
 # AmarClass
 
-<p align="center">
-  <img src="brandings/logo_black.png" alt="AmarClass Logo" width="240" />
-</p>
+<table align="center" bgcolor="#FFFFFF">
+  <tr>
+    <td align="center">
+      <img src="brandings/logo_black.png" alt="AmarClass Logo" width="240" />
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
@@ -15,8 +19,8 @@ AmarClass is a modern academic management and student productivity app built wit
 ## Brand
 
 <p align="center">
-  <img src="brandings/appicon_blue.png" alt="AmarClass App Icon" width="150" />
-  <img src="brandings/logo_black.png" alt="AmarClass Logo" width="220" />
+  <img src="brandings/appicon_blue.png" alt="AmarClass App Icon" width="220" />
+  <img src="brandings/appicon_white.png" alt="AmarClass Logo" width="220" />
 </p>
 
 ## Key Features
@@ -98,5 +102,5 @@ This project is currently for educational and prototype use.
 ---
 
 <p align="center">
-  <sub>Built with ❤️ for smarter academic management.</sub>
+  <sub>Built with ❤️ by RFSN.</sub>
 </p>
