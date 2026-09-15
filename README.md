@@ -7,13 +7,6 @@
 </p>
 
 
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-1F6F9?style=for-the-badge" alt="Platform" />
-</p>
-
 AmarClass is a modern academic management and student productivity app built with Flutter. It helps students stay organized through a clean dashboard, task tracking, academic scheduling, and seamless login flows designed for institutional use.
 
 ## Brand
