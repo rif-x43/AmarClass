@@ -1,12 +1,12 @@
 # AmarClass
 
-<table align="center" bgcolor="#FFFFFF">
-  <tr>
-    <td align="center">
-      <img src="brandings/logo_black.png" alt="AmarClass Logo" width="240" />
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <br>
+  <img src="brandings/logo_white.png" alt="AmarClass Logo" width="300" />
+  <br>
+</p>
+
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
