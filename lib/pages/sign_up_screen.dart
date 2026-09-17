@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'otp_verification_screen.dart';
+import 'user_role.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,7 +13,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String _selectedRole = 'Student';
+  UserRole _selectedRole = UserRole.student;
 
   @override
   Widget build(BuildContext context) {
@@ -64,17 +65,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   _RoleButton(
                     title: 'Student',
-                    selected: _selectedRole == 'Student',
+                    selected: _selectedRole == UserRole.student,
                     onPressed: () {
-                      setState(() => _selectedRole = 'Student');
+                      setState(() => _selectedRole = UserRole.student);
                     },
                   ),
                   const SizedBox(width: 12),
                   _RoleButton(
                     title: 'Faculty',
-                    selected: _selectedRole == 'Faculty',
+                    selected: _selectedRole == UserRole.faculty,
                     onPressed: () {
-                      setState(() => _selectedRole = 'Faculty');
+                      setState(() => _selectedRole = UserRole.faculty);
                     },
                   ),
                 ],
@@ -150,7 +151,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (_) => const OtpVerificationScreen(),
+                        builder: (_) =>
+                            OtpVerificationScreen(role: _selectedRole),
                       ),
                     );
                   },

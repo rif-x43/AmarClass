@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'otp_verification_screen.dart';
+import 'user_role.dart';
 
 class PasswordRecoveryScreen extends StatelessWidget {
-  const PasswordRecoveryScreen({super.key});
+  final UserRole role;
+
+  const PasswordRecoveryScreen({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +120,7 @@ class PasswordRecoveryScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (_) => const OtpVerificationScreen(),
+                        builder: (_) => OtpVerificationScreen(role: role),
                       ),
                     );
                   },

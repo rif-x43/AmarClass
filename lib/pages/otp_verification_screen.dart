@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'dashboard_screen.dart';
+import 'user_role.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({super.key});
+  final UserRole role;
+
+  const OtpVerificationScreen({super.key, required this.role});
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -66,7 +69,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     if (otpCode.length == 6) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        MaterialPageRoute(builder: (_) => DashboardScreen(role: widget.role)),
       );
     }
   }
