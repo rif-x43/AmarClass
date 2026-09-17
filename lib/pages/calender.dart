@@ -55,94 +55,13 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
     return DateTime(d.year, d.month, d.day);
   }
 
-  
-  void openBox({int? index, String? oldTitle, String? oldDesc}) {
-    if (index != null) {
-      titleController.text = oldTitle ?? '';
-      descController.text = oldDesc ?? '';
-    } else {
-      titleController.clear();
-      descController.clear();
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(index == null ? 'Add Task' : 'Edit Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(hintText: 'Title '),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(hintText: 'Description '),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.isNotEmpty && selectDate != null) {
-                  DateTime dKey = justDate(selectDate!);
-
-                  setState(() {
-                    if (taskTitles[dKey] == null) {
-                      taskTitles[dKey] = [];
-                      taskDescs[dKey] = [];
-                    }
-
-                    if (index == null) {
-                      
-                      taskTitles[dKey]!.add(titleController.text);
-                      taskDescs[dKey]!.add(descController.text);
-                    } else {
-                     
-                      taskTitles[dKey]![index] = titleController.text;
-                      taskDescs[dKey]![index] = descController.text;
-                    }
-                  });
-
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(index == null ? 'Save' : 'Update'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  
-  void deleteTask(DateTime dKey, int index) {
-    setState(() {
-      taskTitles[dKey]!.removeAt(index);
-      taskDescs[dKey]!.removeAt(index);
-
-      if (taskTitles[dKey]!.isEmpty) {
-        taskTitles.remove(dKey);
-        taskDescs.remove(dKey);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     DateTime? dKey = selectDate != null ? justDate(selectDate!) : null;
-    List<String> titles = (dKey != null ? taskTitles[dKey] : null) ?? [];
-    List<String> descs = (dKey != null ? taskDescs[dKey] : null) ?? [];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Noob Task Calendar')),
+      appBar: AppBar(title: const Text('Task Calendar')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -156,9 +75,6 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
                   selectDate = s;
                   today = f;
                 });
-              },
-              eventLoader: (d) {
-                return taskTitles[justDate(d)] ?? [];
               },
               headerStyle: const HeaderStyle(
                 formatButtonVisible: false,
@@ -174,60 +90,14 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Tasks:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle, color: Colors.blue, size: 32),
-                    onPressed: () => openBox(),
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.add_circle, color: Colors.blue, size: 32),
+                  //   onPressed: () => openBox(),
+                  // ),
                 ],
               ),
             ),
-            titles.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.all(30.0),
-                    child: Text('Zero Task!'),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: titles.length,
-                    itemBuilder: (context, i) {
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        child: ListTile(
-                          title: Text(titles[i], style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(descs[i]),
-                         
-                          onLongPress: () {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return Wrap(
-                                  children: [
-                                    ListTile(
-                                      leading: const Icon(Icons.edit, color: Colors.green),
-                                      title: const Text('Edit'),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        openBox(index: i, oldTitle: titles[i], oldDesc: descs[i]);
-                                      },
-                                    ),
-                                    ListTile(
-                                      leading: const Icon(Icons.delete, color: Colors.red),
-                                      title: const Text('Delete'),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        deleteTask(dKey!, i);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+
           ],
         ),
       ),

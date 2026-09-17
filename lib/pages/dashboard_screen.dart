@@ -1,10 +1,15 @@
 import 'dart:ui';
 import 'package:amarclass/pages/user_role.dart';
 import 'package:amarclass/pages/tasks_screen.dart';
+import 'package:amarclass/pages/schedule_screen.dart';
+//import 'package:amarclass/pages/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:amarclass/ProfileScreen.dart';
+import 'package:amarclass/pages/calender.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required UserRole role});
+  final UserRole role;
+  const DashboardScreen({super.key, required this.role});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -12,13 +17,6 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
-
-  final List<String> _pageTitles = [
-    'Dashboard',
-    'Tasks',
-    'Schedule',
-    'Profile',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +30,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? _buildDashboardContent()
                 : _selectedIndex == 1
                 ? const TasksScreen()
-                : Center(
-              child: Text(
-                _pageTitles[_selectedIndex],
-                style: const TextStyle(
-                  fontFamily: 'Inter Display',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
+                : _selectedIndex == 2
+                //? ScheduleScreen(role: widget.role)
+                ?SimpleCalendar()
+
+                : const ProfileScreen()
           ),
 
           // Floating Glassmorphism Navigation Bar
@@ -67,14 +59,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         100,
       ), // Bottom padding prevents content hiding behind the nav bar
       children: [
-        // Welcome Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Image(
               image: AssetImage('brandings/logo_black.png'),
-              height: 30,
+              height: 24,
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Partho Yag Paul',
+                      'Partho Paul',
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontFamily: 'Inter Display',
@@ -104,12 +95,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
                 const SizedBox(width: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  child: Image(
-                    image: AssetImage('brandings/appicon_blue.png'),
-                    height: 42,
-                    width: 42,
+                GestureDetector(
+                  onTap: () => setState(() => _selectedIndex = 3),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    child: Image(
+                      image: AssetImage('brandings/appicon_blue.png'),
+                      height: 30,
+                      width: 30,
+                    ),
                   ),
                 ),
               ],
@@ -135,6 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 title: 'Active Courses',
                 value: '4',
                 color: const Color(0xFF2F8DF6),
+                onTap: () => setState(() => _selectedIndex = 2),
               ),
             ),
             const SizedBox(width: 16),
@@ -143,6 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 title: 'Pending Tasks',
                 value: '2',
                 color: Colors.black87,
+                onTap: () => setState(() => _selectedIndex = 1),
               ),
             ),
           ],
@@ -161,7 +157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () => setState(() => _selectedIndex = 1),
               child: const Text(
                 'View all',
                 style: TextStyle(
@@ -203,7 +199,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 title: 'Laplace Transformation Worksheet',
                 dueText: 'Due Tuesday',
                 progress: 0,
-                status: 'Not started',
+                status: 'Due',
                 compact: true,
               ),
             ),
@@ -299,45 +295,50 @@ class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final Color color;
+  final VoidCallback? onTap;
 
   const _StatCard({
     required this.title,
     required this.value,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'Inter Display',
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: color,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Inter Display',
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Inter Display',
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Inter Display',
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

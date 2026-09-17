@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   radius: 36,
                   backgroundColor: Color(0xFF5B9BF8),
                   child: Text(
-                    'JD',
+                    'PP',
                     style: TextStyle(
                       fontFamily: 'Inter Display',
                       fontSize: 24,
@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'John Doe',
+                      'Partho Paul',
                       style: TextStyle(
                         fontFamily: 'Inter Display',
                         fontSize: 22,
@@ -143,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 20),
                   _buildField(
                     'FULL NAME',
-                    'John Doe',
+                    'Partho Paul',
                   ),
 
                   const SizedBox(height: 15),
@@ -161,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 15),
                   _buildField(
                     'EMAIL',
-                    'j.doe@university.edu',
+                    'test@aust.edu',
                   ),
                 ],
               ),
@@ -312,6 +312,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+
+            SizedBox(height: 50),
           ],
         ),
       ),

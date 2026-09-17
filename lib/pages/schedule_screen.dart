@@ -391,7 +391,7 @@ class _ScheduleEvent extends StatelessWidget {
             height: 48,
             width: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF2F8DF6).withOpacity(0.1),
+              color: const Color(0xFF2F8DF6).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
