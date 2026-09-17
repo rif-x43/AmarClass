@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'profile_screen.dart';
@@ -56,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-              child: _buildGlassNavigationBar(),
+              child: _buildNavigationBar(),
             ),
           ),
         ],
@@ -409,49 +407,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildGlassNavigationBar() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.7),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-            borderRadius: BorderRadius.circular(32),
+  Widget _buildNavigationBar() {
+    return Container(
+      height: 64,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black12),
+        borderRadius: BorderRadius.circular(32),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _NavItem(
+            icon: Icons.dashboard_outlined,
+            selectedIcon: Icons.dashboard,
+            isSelected: _selectedIndex == 0,
+            onTap: () => setState(() => _selectedIndex = 0),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.dashboard_outlined,
-                selectedIcon: Icons.dashboard,
-                isSelected: _selectedIndex == 0,
-                onTap: () => setState(() => _selectedIndex = 0),
-              ),
-              _NavItem(
-                icon: Icons.task_alt_outlined,
-                selectedIcon: Icons.task_alt,
-                isSelected: _selectedIndex == 1,
-                onTap: () => setState(() => _selectedIndex = 1),
-              ),
-              _NavItem(
-                icon: Icons.calendar_month_outlined,
-                selectedIcon: Icons.calendar_month,
-                isSelected: _selectedIndex == 2,
-                onTap: () => setState(() => _selectedIndex = 2),
-              ),
-              _NavItem(
-                icon: Icons.person_outline,
-                selectedIcon: Icons.person,
-                isSelected: _selectedIndex == 3,
-                onTap: () => setState(() => _selectedIndex = 3),
-              ),
-            ],
+          _NavItem(
+            icon: Icons.task_alt_outlined,
+            selectedIcon: Icons.task_alt,
+            isSelected: _selectedIndex == 1,
+            onTap: () => setState(() => _selectedIndex = 1),
           ),
-        ),
+          _NavItem(
+            icon: Icons.calendar_month_outlined,
+            selectedIcon: Icons.calendar_month,
+            isSelected: _selectedIndex == 2,
+            onTap: () => setState(() => _selectedIndex = 2),
+          ),
+          _NavItem(
+            icon: Icons.person_outline,
+            selectedIcon: Icons.person,
+            isSelected: _selectedIndex == 3,
+            onTap: () => setState(() => _selectedIndex = 3),
+          ),
+        ],
       ),
     );
   }
@@ -970,8 +962,7 @@ class _NavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
