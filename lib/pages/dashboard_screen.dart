@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'tasks_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -26,20 +27,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Stack(
         children: [
           // Main Body Content
+          // NEW MINIMAL CODE
           SafeArea(
             child: _selectedIndex == 0
                 ? _buildDashboardContent()
+                : _selectedIndex == 1
+                ? const TasksScreen()
                 : Center(
-                    child: Text(
-                      _pageTitles[_selectedIndex],
-                      style: const TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
+              child: Text(
+                _pageTitles[_selectedIndex],
+                style: const TextStyle(
+                  fontFamily: 'Inter Display',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
           ),
 
           // Floating Glassmorphism Navigation Bar
