@@ -1,9 +1,10 @@
 import 'dart:ui';
-
+import 'package:amarclass/pages/user_role.dart';
+import 'package:amarclass/pages/tasks_screen.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, required UserRole role});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -29,17 +30,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SafeArea(
             child: _selectedIndex == 0
                 ? _buildDashboardContent()
+                : _selectedIndex == 1
+                ? const TasksScreen()
                 : Center(
-                    child: Text(
-                      _pageTitles[_selectedIndex],
-                      style: const TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
+              child: Text(
+                _pageTitles[_selectedIndex],
+                style: const TextStyle(
+                  fontFamily: 'Inter Display',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
           ),
 
           // Floating Glassmorphism Navigation Bar
@@ -248,8 +251,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Container(
           height: 64,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            color: Colors.white.withValues(alpha: 0.7),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             borderRadius: BorderRadius.circular(32),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -366,7 +369,7 @@ class _CourseCard extends StatelessWidget {
             height: 48,
             width: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF2F8DF6).withOpacity(0.1),
+              color: const Color(0xFF2F8DF6).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
@@ -544,7 +547,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF2F8DF6).withOpacity(0.1)
+              ? const Color(0xFF2F8DF6).withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
