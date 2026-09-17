@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
 import 'sign_up_screen.dart';
+import 'user_role.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  UserRole _selectedRole = UserRole.student;
 
   @override
   void dispose() {
@@ -29,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text == 'test') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute<void>(builder: (_) => const DashboardScreen()),
+        MaterialPageRoute(builder: (_) => DashboardScreen(role: _selectedRole)),
       );
     }
   }
@@ -50,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 image: AssetImage('brandings/logo_black.png'),
                 height: 30,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 32),
+
               const Text(
                 'Welcome Back',
                 style: TextStyle(
@@ -70,20 +73,55 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 48),
+
+              const Text(
+                'Sign in as',
+                style: TextStyle(
+                  fontFamily: 'Inter Display',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _LoginRoleButton(
+                      title: 'Student',
+                      selected: _selectedRole == UserRole.student,
+                      onPressed: () => setState(() {
+                        _selectedRole = UserRole.student;
+                      }),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _LoginRoleButton(
+                      title: 'Faculty',
+                      selected: _selectedRole == UserRole.faculty,
+                      onPressed: () => setState(() {
+                        _selectedRole = UserRole.faculty;
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
               _CustomTextField(
                 label: 'Institutional Email Address',
                 hint: 'partho.yag@aust.edu',
                 controller: _emailController,
               ),
               const SizedBox(height: 20),
+
               _CustomTextField(
                 label: 'Password',
                 hint: '••••••••',
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 suffixIcon: IconButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
                   icon: Icon(
                     _obscurePassword
                         ? Icons.visibility_off_outlined
@@ -91,39 +129,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.black45,
                     size: 18,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               const SizedBox(height: 16),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: 20,
+                        width: 20,
                         child: Checkbox(
                           value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
+                          onChanged: (value) =>
+                              setState(() => _rememberMe = value ?? false),
                           activeColor: const Color(0xFF2F8DF6),
-                          side: BorderSide.none,
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return const Color(0xFF2F8DF6);
-                            }
-                            return Colors.white;
-                          }),
+                          side: const BorderSide(color: Colors.black26),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
                       ),
@@ -139,37 +166,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   TextButton(
-                    style: TextButton.styleFrom(
-                      splashFactory: NoSplash.splashFactory,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PasswordRecoveryScreen(role: _selectedRole),
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const PasswordRecoveryScreen(),
-                        ),
-                      );
-                    },
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
                         fontFamily: 'Inter Display',
                         fontSize: 14,
                         color: Color(0xFF2F8DF6),
-                        fontWeight: FontWeight.w300,
                       ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 48),
+
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF2F8DF6),
-                    splashFactory: NoSplash.splashFactory,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -180,20 +202,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter Display',
                       fontSize: 16,
-                      fontWeight: FontWeight.normal,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
+
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: TextButton.icon(
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.white,
-                    splashFactory: NoSplash.splashFactory,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -207,14 +228,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter Display',
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
                       color: Colors.black87,
                     ),
                   ),
-                  onPressed: null,
+                  onPressed: () {},
                 ),
               ),
               const SizedBox(height: 32),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -227,27 +248,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   TextButton(
-                    style: TextButton.styleFrom(
-                      splashFactory: NoSplash.splashFactory,
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const SignUpScreen(),
-                        ),
-                      );
-                    },
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
                         color: Color(0xFF2F8DF6),
                         fontFamily: 'Inter Display',
                         fontSize: 13,
-                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ),
@@ -255,6 +265,38 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginRoleButton extends StatelessWidget {
+  final String title;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  const _LoginRoleButton({
+    required this.title,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        backgroundColor: selected ? Colors.black87 : Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontFamily: 'Inter Display',
+          fontSize: 14,
+          color: selected ? Colors.white : Colors.black54,
         ),
       ),
     );
@@ -314,7 +356,7 @@ class _CustomTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: Color(0xFF2F8DF6),
-                width: 0.2,
+                width: 0.5,
               ),
             ),
           ),
