@@ -17,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
-  UserRole _selectedRole = UserRole.student;
 
   @override
   void dispose() {
@@ -27,11 +26,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _signIn() {
-    if (_emailController.text == 'test@aust.edu' &&
-        _passwordController.text == 'test') {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    UserRole? role;
+
+    if (email == 'test@aust.edu' && password == 'test') {
+      role = UserRole.student;
+    } else if (email == 'test2@aust.edu' && password == 'test2') {
+      role = UserRole.faculty;
+    }
+
+    if (role != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => DashboardScreen(role: _selectedRole)),
+        MaterialPageRoute(builder: (_) => DashboardScreen(role: role!)),
       );
     }
   }
@@ -73,41 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 48),
-
-              const Text(
-                'Sign in as',
-                style: TextStyle(
-                  fontFamily: 'Inter Display',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: _LoginRoleButton(
-                      title: 'Student',
-                      selected: _selectedRole == UserRole.student,
-                      onPressed: () => setState(() {
-                        _selectedRole = UserRole.student;
-                      }),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _LoginRoleButton(
-                      title: 'Faculty',
-                      selected: _selectedRole == UserRole.faculty,
-                      onPressed: () => setState(() {
-                        _selectedRole = UserRole.faculty;
-                      }),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
 
               _CustomTextField(
                 label: 'Institutional Email Address',
@@ -169,8 +142,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            PasswordRecoveryScreen(role: _selectedRole),
+                        builder: (_) => PasswordRecoveryScreen(
+                          role: _emailController.text.trim() == 'test2@aust.edu'
+                              ? UserRole.faculty
+                              : UserRole.student,
+                        ),
                       ),
                     ),
                     child: const Text(
@@ -265,38 +241,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LoginRoleButton extends StatelessWidget {
-  final String title;
-  final bool selected;
-  final VoidCallback onPressed;
-
-  const _LoginRoleButton({
-    required this.title,
-    required this.selected,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        backgroundColor: selected ? Colors.black87 : Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Inter Display',
-          fontSize: 14,
-          color: selected ? Colors.white : Colors.black54,
         ),
       ),
     );

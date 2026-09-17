@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'profile_screen.dart';
+import 'schedule_screen.dart';
 import 'user_role.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -37,6 +38,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : _buildDashboardContent())
                 : _selectedIndex == 3
                 ? ProfileScreen(role: widget.role)
+                : _selectedIndex == 2
+                ? ScheduleScreen(role: widget.role)
                 : Center(
                     child: Text(
                       _pageTitles[_selectedIndex],
