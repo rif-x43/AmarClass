@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tasks_screen_details.dart';
-class TaskItem
+import 'task_item.dart';
+/*class TaskItem
 {
   String title;
   String course;
@@ -15,7 +16,7 @@ class TaskItem
   });
 }
 
-
+*/
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
   @override
@@ -76,6 +77,13 @@ class _TasksScreenState extends State<TasksScreen>
       status: 'DONE!',
     ),
 
+    TaskItem(
+      title: 'Bangla',
+      course: 'HUM 1101',
+      due: 'Tomorrow',
+      status: 'DONE!',
+    ),
+
 
   ];
 
@@ -125,7 +133,7 @@ class _TasksScreenState extends State<TasksScreen>
                    Navigator.push(
                      context,
                      MaterialPageRoute(
-                         builder: (context)=>const TaskDetailsScreen(),
+                         builder: (context)=>TaskDetailsScreen(task:task),
                      ),
                    );
                   }
