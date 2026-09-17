@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'tasks_screen_details.dart';
 class TaskItem
 {
   String title;
@@ -87,12 +88,13 @@ class _TasksScreenState extends State<TasksScreen>
       ),
 
       body: ListView.builder(
+          padding: const EdgeInsets.only(bottom:100),
           itemCount: tasks.length,
           itemBuilder:(context,index){
             TaskItem task = tasks[index];
             
             return Card(
-              margin: const EdgeInsets.all(10),
+              margin: const EdgeInsets.all(8),
               child: ListTile(
                 leading: const Icon(Icons.assessment),
                 contentPadding: const EdgeInsets.all(10),
@@ -117,6 +119,16 @@ class _TasksScreenState extends State<TasksScreen>
                       fontWeight: FontWeight.bold,
                     ),
                 ),
+
+                onTap: ()
+                  {
+                   Navigator.push(
+                     context,
+                     MaterialPageRoute(
+                         builder: (context)=>const TaskDetailsScreen(),
+                     ),
+                   );
+                  }
               ),
             );
           },
@@ -124,4 +136,6 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 }
+
+
 
