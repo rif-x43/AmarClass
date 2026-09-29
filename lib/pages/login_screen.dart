@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
@@ -15,10 +16,40 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const _rememberedEmailKey = 'remembered_email';
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedEmail();
+  }
+
+  Future<void> _loadRememberedEmail() async {
+    final preferences = await SharedPreferences.getInstance();
+    final email = preferences.getString(_rememberedEmailKey);
+
+    if (!mounted || email == null || email.isEmpty) return;
+
+    setState(() {
+      _emailController.text = email;
+      _rememberMe = true;
+    });
+  }
+
+  Future<void> _saveRememberedEmail(String email) async {
+    final preferences = await SharedPreferences.getInstance();
+
+    if (_rememberMe) {
+      await preferences.setString(_rememberedEmailKey, email);
+    } else {
+      await preferences.remove(_rememberedEmailKey);
+    }
+  }
 
   @override
   void dispose() {
@@ -27,13 +58,18 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future _signIn() async {
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _signIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -41,23 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = credential.user;
       if (user == null) return;
 
+      await _saveRememberedEmail(email);
       await _goToDashboard(user);
     } on FirebaseAuthException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Login failed'),
-        ),
-      );
+      _showMessage(error.message ?? 'Login failed');
     } on FirebaseException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Database error'),
-        ),
-      );
+      _showMessage(error.message ?? 'Database error');
     }
   }
 
@@ -65,37 +90,49 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final provider = GoogleAuthProvider();
 
-      final credential = await FirebaseAuth.instance
-          .signInWithPopup(provider);
+      final credential = await FirebaseAuth.instance.signInWithPopup(provider);
 
       final user = credential.user;
       if (user == null) return;
 
-      final userRef = FirebaseFirestore.instance
+      final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid);
-
-      final userDoc = await userRef.get();
+          .doc(user.uid)
+          .get();
 
       if (!userDoc.exists) {
-        await userRef.set({
-          'email': user.email ?? '',
-          'name': user.displayName ?? '',
-          'role': 'student',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        await FirebaseAuth.instance.signOut();
+        _showMessage(
+          'No account found. Please sign up first and choose a role.',
+        );
+        return;
       }
 
+      await _saveRememberedEmail(user.email ?? '');
       await _goToDashboard(user);
     } on FirebaseAuthException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Google login failed'),
-        ),
-      );
+      _showMessage(error.message ?? 'Google login failed');
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Database error');
     }
+  }
+
+  UserRole? _roleFromValue(Object? value) {
+    switch (value) {
+      case 'student':
+        return UserRole.student;
+      case 'faculty':
+        return UserRole.faculty;
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _openPasswordRecovery() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
+    );
   }
 
   Future<void> _goToDashboard(User user) async {
@@ -104,28 +141,20 @@ class _LoginScreenState extends State<LoginScreen> {
         .doc(user.uid)
         .get();
 
-    final roleValue = userDoc.data()?['role'];
+    final role = _roleFromValue(userDoc.data()?['role']);
 
-    if (roleValue != 'student' && roleValue != 'faculty') {
+    if (role == null) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User role পাওয়া যায়নি')),
-      );
+      _showMessage('User role not found');
       return;
     }
-
-    final role = roleValue == 'faculty'
-        ? UserRole.faculty
-        : UserRole.student;
 
     if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => DashboardScreen(role: role!),
-      ),
+      MaterialPageRoute(builder: (_) => DashboardScreen(role: role)),
     );
   }
 
@@ -169,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               _CustomTextField(
                 label: 'Institutional Email Address',
-                hint: 'partho.yag@aust.edu',
+                hint: 'john.doe@aust.edu',
                 controller: _emailController,
               ),
               const SizedBox(height: 20),
@@ -224,16 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PasswordRecoveryScreen(
-                          role: _emailController.text.trim() == 'test2@aust.edu'
-                              ? UserRole.faculty
-                              : UserRole.student,
-                        ),
-                      ),
-                    ),
+                    onPressed: _openPasswordRecovery,
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
@@ -335,14 +355,14 @@ class _LoginScreenState extends State<LoginScreen> {
 class _CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final bool obscureText;
   final Widget? suffixIcon;
 
   const _CustomTextField({
     required this.label,
     required this.hint,
-    this.controller,
+    required this.controller,
     this.obscureText = false,
     this.suffixIcon,
   });

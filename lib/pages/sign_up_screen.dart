@@ -5,37 +5,92 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'user_role.dart';
 
-class _RoleButton extends StatelessWidget {
-  const _RoleButton({
-    required this.title,
+class _RoleSelector extends StatelessWidget {
+  const _RoleSelector({required this.selectedRole, required this.onChanged});
+
+  final UserRole selectedRole;
+  final ValueChanged<UserRole> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black12),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          _RoleOption(
+            label: 'Student',
+            icon: Icons.school_outlined,
+            selected: selectedRole == UserRole.student,
+            onTap: () => onChanged(UserRole.student),
+          ),
+          _RoleOption(
+            label: 'Faculty',
+            icon: Icons.co_present_outlined,
+            selected: selectedRole == UserRole.faculty,
+            onTap: () => onChanged(UserRole.faculty),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoleOption extends StatelessWidget {
+  const _RoleOption({
+    required this.label,
+    required this.icon,
     required this.selected,
-    required this.onPressed,
+    required this.onTap,
   });
 
-  final String title;
+  final String label;
+  final IconData icon;
   final bool selected;
-  final VoidCallback onPressed;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: TextButton(
-        style: TextButton.styleFrom(
-          backgroundColor: selected ? Colors.black87 : Colors.white,
-          splashFactory: NoSplash.splashFactory,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        onPressed: onPressed,
-        child: Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Inter Display',
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-            color: selected ? Colors.white : Colors.black54,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(vertical: 11),
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFFF3F8FF) : Colors.transparent,
+              border: selected
+                  ? Border.all(color: const Color(0xFF9CCBFA), width: 1)
+                  : null,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: selected ? const Color(0xFF4D9BF5) : Colors.black45,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: selected ? const Color(0xFF4D9BF5) : Colors.black54,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -65,7 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
-    TextEditingController? controller,
+    required TextEditingController controller,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +135,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        TextFormField(
+        TextField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
@@ -115,21 +170,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  UserRole? _roleFromValue(Object? value) {
+    switch (value) {
+      case 'student':
+        return UserRole.student;
+      case 'faculty':
+        return UserRole.faculty;
+      default:
+        return null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FF),
-      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 56, 24, 32),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Image(
@@ -166,35 +238,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  _RoleButton(
-                    title: 'Student',
-                    selected: _selectedRole == UserRole.student,
-                    onPressed: () {
-                      setState(() => _selectedRole = UserRole.student);
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  _RoleButton(
-                    title: 'Faculty',
-                    selected: _selectedRole == UserRole.faculty,
-                    onPressed: () {
-                      setState(() => _selectedRole = UserRole.faculty);
-                    },
-                  ),
-                ],
+              _RoleSelector(
+                selectedRole: _selectedRole,
+                onChanged: (role) => setState(() => _selectedRole = role),
               ),
               const SizedBox(height: 24),
               _signUpField(
                 label: 'Full Name',
-                hint: 'e.g. Partho Yag Paul',
+                hint: 'e.g. John Doe',
                 controller: _nameController,
               ),
               const SizedBox(height: 16),
               _signUpField(
                 label: 'Institutional Email Address',
-                hint: 'partho.yag@aust.edu',
+                hint: 'john.doe@aust.edu',
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
               ),
@@ -214,11 +271,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: Colors.black45,
                     size: 18,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               const SizedBox(height: 16),
@@ -237,11 +291,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: Colors.black45,
                     size: 18,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureConfirmPassword = !_obscureConfirmPassword;
-                    });
-                  },
+                  onPressed: () => setState(
+                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
@@ -279,38 +331,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   label: const Text('Sign up with Google'),
                 ),
               ),
-              //const SizedBox(height: 24),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     const Text(
-              //       'Already have an account?',
-              //       style: TextStyle(
-              //         color: Colors.black54,
-              //         fontFamily: 'Inter Display',
-              //         fontSize: 13,
-              //       ),
-              //     ),
-                  // TextButton(
-                  //   style: TextButton.styleFrom(
-                  //     splashFactory: NoSplash.splashFactory,
-                  //     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  //     minimumSize: Size.zero,
-                  //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  //   ),
-                  //   onPressed: () => Navigator.pop(context),
-                  //   child: const Text(
-                  //     'Sign In',
-                  //     style: TextStyle(
-                  //       color: Color(0xFF2F8DF6),
-                  //       fontFamily: 'Inter Display',
-                  //       fontSize: 13,
-                  //       fontWeight: FontWeight.normal,
-                  //     ),
-                  //   ),
-                  // ),
-                //],
-              //),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Already have an account?',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontFamily: 'Inter Display',
+                      fontSize: 13,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Sign In',
+                      style: TextStyle(
+                        color: Color(0xFF2F8DF6),
+                        fontFamily: 'Inter Display',
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -327,35 +372,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (user == null) return;
 
-      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
       final userDoc = await userRef.get();
 
       if (!userDoc.exists) {
         await userRef.set({
           'name': user.displayName ?? '',
           'email': user.email ?? '',
-          'role': _selectedRole == UserRole.faculty ? 'faculty' : 'student',
+          'role': _selectedRole.name,
           'createdAt': FieldValue.serverTimestamp(),
         });
+      }
+
+      final role = userDoc.exists
+          ? _roleFromValue(userDoc.data()?['role'])
+          : _selectedRole;
+
+      if (role == null) {
+        _showMessage('User role not found');
+        return;
       }
 
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => DashboardScreen(role: _selectedRole),
-        ),
+        MaterialPageRoute(builder: (_) => DashboardScreen(role: role)),
       );
     } on FirebaseAuthException catch (error) {
-      debugPrint('Google signup failed: ${error.code}');
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Signup failed: ${error.message ?? error.code}'),
-        ),
-      );
+      _showMessage(error.message ?? 'Google signup failed');
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Firestore error');
     }
   }
 
@@ -380,27 +429,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       final user = credential.user;
       if (user == null) return;
 
       await user.updateDisplayName(name);
 
-      final role = _selectedRole == UserRole.faculty
-          ? 'faculty'
-          : 'student';
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .set({
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'name': name,
         'email': email,
-        'role': role,
+        'role': _selectedRole.name,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -408,9 +447,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => DashboardScreen(role: _selectedRole),
-        ),
+        MaterialPageRoute(builder: (_) => DashboardScreen(role: _selectedRole)),
       );
     } on FirebaseAuthException catch (error) {
       _showMessage(error.message ?? error.code);
