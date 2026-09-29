@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "988517420003",
+    "project_id": "amarclass-9c547",
+    "storage_bucket": "amarclass-9c547.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988517420003:android:3750bcd6b08277516beed6",
+        "android_client_info": {
+          "package_name": "com.arena_rfsn.amarclass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoSaIi6YoWEmyokTtY8Ql_0ZyB3CIbRxY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

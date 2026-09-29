@@ -1,22 +1,18 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import 'dashboard_screen.dart';
 import 'user_role.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final UserRole role;
-
   const OtpVerificationScreen({super.key, required this.role});
-
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(
-    6,
+  final List<TextEditingController> _controllers = List.
+  generate(6,
     (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());

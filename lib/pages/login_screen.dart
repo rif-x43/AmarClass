@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
@@ -25,23 +27,106 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
+  Future _signIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    UserRole? role;
 
-    if (email == 'test@aust.edu' && password == 'test') {
-      role = UserRole.student;
-    } else if (email == 'test2@aust.edu' && password == 'test2') {
-      role = UserRole.faculty;
-    }
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    if (role != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => DashboardScreen(role: role!)),
+      final user = credential.user;
+      if (user == null) return;
+
+      await _goToDashboard(user);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Login failed'),
+        ),
+      );
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Database error'),
+        ),
       );
     }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final provider = GoogleAuthProvider();
+
+      final credential = await FirebaseAuth.instance
+          .signInWithPopup(provider);
+
+      final user = credential.user;
+      if (user == null) return;
+
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+
+      final userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        await userRef.set({
+          'email': user.email ?? '',
+          'name': user.displayName ?? '',
+          'role': 'student',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      await _goToDashboard(user);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Google login failed'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _goToDashboard(User user) async {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    final roleValue = userDoc.data()?['role'];
+
+    if (roleValue != 'student' && roleValue != 'faculty') {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User role পাওয়া যায়নি')),
+      );
+      return;
+    }
+
+    final role = roleValue == 'faculty'
+        ? UserRole.faculty
+        : UserRole.student;
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DashboardScreen(role: role!),
+      ),
+    );
   }
 
   @override
@@ -207,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.black87,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: _signInWithGoogle,
                 ),
               ),
               const SizedBox(height: 32),
