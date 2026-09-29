@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
 import 'sign_up_screen.dart';
@@ -59,9 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _signIn() async {
@@ -69,8 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
 
     try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -81,21 +80,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await _saveRememberedEmail(email);
       await _goToDashboard(user);
     } on FirebaseAuthException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Login failed'),
-        ),
-      );
+      _showMessage(error.message ?? 'Login failed');
     } on FirebaseException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Database error'),
-        ),
-      );
+      _showMessage(error.message ?? 'Database error');
     }
   }
 
@@ -103,73 +90,28 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final provider = GoogleAuthProvider();
 
-      final credential = await FirebaseAuth.instance
-          .signInWithPopup(provider);
+      final credential = await FirebaseAuth.instance.signInWithPopup(provider);
 
       final user = credential.user;
       if (user == null) return;
 
-      await _saveRememberedEmail(user.email ?? '');
-
-      final userRef = FirebaseFirestore.instance
+      final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid);
-
-      final userDoc = await userRef.get();
+          .doc(user.uid)
+          .get();
 
       if (!userDoc.exists) {
         await FirebaseAuth.instance.signOut();
-        _showMessage('No account found. Please sign up first and choose a role.');
+        _showMessage(
+          'No account found. Please sign up first and choose a role.',
+        );
         return;
       }
 
+      await _saveRememberedEmail(user.email ?? '');
       await _goToDashboard(user);
     } on FirebaseAuthException catch (error) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message ?? 'Google login failed'),
-        ),
-      );
-    } on FirebaseException catch (error) {
-      _showMessage(error.message ?? 'Database error');
-    }
-  }
-
-  Future<void> _openPasswordRecovery() async {
-    final email = _emailController.text.trim();
-
-    if (email.isEmpty) {
-      _showMessage('Enter your email address first.');
-      return;
-    }
-
-    try {
-      final result = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
-
-      if (result.docs.isEmpty) {
-        _showMessage('No account found for this email address.');
-        return;
-      }
-
-      final role = _roleFromValue(result.docs.first.data()['role']);
-      if (role == null) {
-        _showMessage('User role not found.');
-        return;
-      }
-
-      if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PasswordRecoveryScreen(role: role),
-        ),
-      );
+      _showMessage(error.message ?? 'Google login failed');
     } on FirebaseException catch (error) {
       _showMessage(error.message ?? 'Database error');
     }
@@ -186,6 +128,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _openPasswordRecovery() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
+    );
+  }
+
   Future<void> _goToDashboard(User user) async {
     final userDoc = await FirebaseFirestore.instance
         .collection('users')
@@ -197,9 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (role == null) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User role not found')),
-      );
+      _showMessage('User role not found');
       return;
     }
 
@@ -207,9 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => DashboardScreen(role: role),
-      ),
+      MaterialPageRoute(builder: (_) => DashboardScreen(role: role)),
     );
   }
 
@@ -308,16 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PasswordRecoveryScreen(
-                          role: _emailController.text.trim() == 'test2@aust.edu'
-                              ? UserRole.faculty
-                              : UserRole.student,
-                        ),
-                      ),
-                    ),
+                    onPressed: _openPasswordRecovery,
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
