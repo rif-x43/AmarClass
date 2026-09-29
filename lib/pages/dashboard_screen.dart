@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'courses_screen.dart';
+import 'floating_nav_bar.dart';
 import 'profile_screen.dart';
 import 'schedule_screen.dart';
 import 'user_role.dart';
@@ -18,6 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<String> _pageTitles = [
     'Dashboard',
+    'Courses',
     'Tasks',
     'Schedule',
     'Profile',
@@ -29,37 +32,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: const Color(0xFFF8F8FF),
       body: Stack(
         children: [
-          SafeArea(
-            child: _selectedIndex == 0
-                ? (widget.role == UserRole.faculty
-                      ? _buildFacultyContent()
-                      : _buildDashboardContent())
-                : _selectedIndex == 3
-                ? ProfileScreen(role: widget.role)
-                : _selectedIndex == 2
-                ? ScheduleScreen(role: widget.role)
-                : Center(
-                    child: Text(
-                      _pageTitles[_selectedIndex],
-                      style: const TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-          ),
+          SafeArea(child: _buildCurrentPage()),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-              child: _buildNavigationBar(),
+              child: FloatingNavBar(
+                selectedIndex: _selectedIndex,
+                onItemSelected: (index) =>
+                    setState(() => _selectedIndex = index),
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildCurrentPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return widget.role == UserRole.faculty
+            ? _buildFacultyContent()
+            : _buildDashboardContent();
+      case 1:
+        return CoursesScreen(role: widget.role);
+      case 3:
+        return ScheduleScreen(role: widget.role);
+      case 4:
+        return ProfileScreen(role: widget.role);
+      default:
+        return Center(
+          child: Text(
+            _pageTitles[_selectedIndex],
+            style: const TextStyle(
+              fontFamily: 'Inter Display',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        );
+    }
   }
 
   Widget _buildFacultyContent() {
@@ -403,47 +417,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           courseName: name,
           instructor: instructor,
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationBar() {
-    return Container(
-      height: 64,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavItem(
-            icon: Icons.dashboard_outlined,
-            selectedIcon: Icons.dashboard,
-            isSelected: _selectedIndex == 0,
-            onTap: () => setState(() => _selectedIndex = 0),
-          ),
-          _NavItem(
-            icon: Icons.task_alt_outlined,
-            selectedIcon: Icons.task_alt,
-            isSelected: _selectedIndex == 1,
-            onTap: () => setState(() => _selectedIndex = 1),
-          ),
-          _NavItem(
-            icon: Icons.calendar_month_outlined,
-            selectedIcon: Icons.calendar_month,
-            isSelected: _selectedIndex == 2,
-            onTap: () => setState(() => _selectedIndex = 2),
-          ),
-          _NavItem(
-            icon: Icons.person_outline,
-            selectedIcon: Icons.person,
-            isSelected: _selectedIndex == 3,
-            onTap: () => setState(() => _selectedIndex = 3),
-          ),
-        ],
       ),
     );
   }
@@ -939,42 +912,6 @@ class _TaskCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData selectedIcon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2F8DF6).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Icon(
-          isSelected ? selectedIcon : icon,
-          color: isSelected ? const Color(0xFF2F8DF6) : Colors.black45,
-          size: 26,
-        ),
       ),
     );
   }

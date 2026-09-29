@@ -174,16 +174,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  UserRole? _roleFromValue(Object? value) {
-    switch (value) {
-      case 'student':
-        return UserRole.student;
-      case 'faculty':
-        return UserRole.faculty;
-      default:
-        return null;
-    }
-  }
+  UserRole? _roleFromValue(Object? value) =>
+      const {'student': UserRole.student, 'faculty': UserRole.faculty}[value];
 
   @override
   void dispose() {
@@ -365,10 +357,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _signUpWithGoogle() async {
     try {
-      final provider = GoogleAuthProvider();
-
-      final credential = await FirebaseAuth.instance.signInWithPopup(provider);
-      final user = credential.user;
+      final user = (await FirebaseAuth.instance.signInWithPopup(
+        GoogleAuthProvider(),
+      )).user;
 
       if (user == null) return;
 
