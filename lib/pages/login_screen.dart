@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
 import 'sign_up_screen.dart';
@@ -15,10 +15,40 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const _rememberedEmailKey = 'remembered_email';
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedEmail();
+  }
+
+  Future<void> _loadRememberedEmail() async {
+    final preferences = await SharedPreferences.getInstance();
+    final email = preferences.getString(_rememberedEmailKey);
+
+    if (!mounted || email == null || email.isEmpty) return;
+
+    setState(() {
+      _emailController.text = email;
+      _rememberMe = true;
+    });
+  }
+
+  Future<void> _saveRememberedEmail(String email) async {
+    final preferences = await SharedPreferences.getInstance();
+
+    if (_rememberMe) {
+      await preferences.setString(_rememberedEmailKey, email);
+    } else {
+      await preferences.remove(_rememberedEmailKey);
+    }
+  }
 
   @override
   void dispose() {
@@ -27,7 +57,14 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future _signIn() async {
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _signIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
@@ -41,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = credential.user;
       if (user == null) return;
 
+      await _saveRememberedEmail(email);
       await _goToDashboard(user);
     } on FirebaseAuthException catch (error) {
       if (!mounted) return;
@@ -71,6 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = credential.user;
       if (user == null) return;
 
+      await _saveRememberedEmail(user.email ?? '');
+
       final userRef = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid);
@@ -78,12 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final userDoc = await userRef.get();
 
       if (!userDoc.exists) {
-        await userRef.set({
-          'email': user.email ?? '',
-          'name': user.displayName ?? '',
-          'role': 'student',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        await FirebaseAuth.instance.signOut();
+        _showMessage('No account found. Please sign up first and choose a role.');
+        return;
       }
 
       await _goToDashboard(user);
@@ -95,6 +132,57 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text(error.message ?? 'Google login failed'),
         ),
       );
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Database error');
+    }
+  }
+
+  Future<void> _openPasswordRecovery() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showMessage('Enter your email address first.');
+      return;
+    }
+
+    try {
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (result.docs.isEmpty) {
+        _showMessage('No account found for this email address.');
+        return;
+      }
+
+      final role = _roleFromValue(result.docs.first.data()['role']);
+      if (role == null) {
+        _showMessage('User role not found.');
+        return;
+      }
+
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PasswordRecoveryScreen(role: role),
+        ),
+      );
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Database error');
+    }
+  }
+
+  UserRole? _roleFromValue(Object? value) {
+    switch (value) {
+      case 'student':
+        return UserRole.student;
+      case 'faculty':
+        return UserRole.faculty;
+      default:
+        return null;
     }
   }
 
@@ -104,27 +192,23 @@ class _LoginScreenState extends State<LoginScreen> {
         .doc(user.uid)
         .get();
 
-    final roleValue = userDoc.data()?['role'];
+    final role = _roleFromValue(userDoc.data()?['role']);
 
-    if (roleValue != 'student' && roleValue != 'faculty') {
+    if (role == null) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User role পাওয়া যায়নি')),
+        const SnackBar(content: Text('User role not found')),
       );
       return;
     }
-
-    final role = roleValue == 'faculty'
-        ? UserRole.faculty
-        : UserRole.student;
 
     if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => DashboardScreen(role: role!),
+        builder: (_) => DashboardScreen(role: role),
       ),
     );
   }
@@ -169,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               _CustomTextField(
                 label: 'Institutional Email Address',
-                hint: 'partho.yag@aust.edu',
+                hint: 'john.doe@aust.edu',
                 controller: _emailController,
               ),
               const SizedBox(height: 20),
@@ -335,14 +419,14 @@ class _LoginScreenState extends State<LoginScreen> {
 class _CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final bool obscureText;
   final Widget? suffixIcon;
 
   const _CustomTextField({
     required this.label,
     required this.hint,
-    this.controller,
+    required this.controller,
     this.obscureText = false,
     this.suffixIcon,
   });
