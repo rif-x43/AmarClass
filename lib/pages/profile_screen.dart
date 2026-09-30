@@ -22,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
         ? 'Faculty · Computer Science'
         : 'Student · B.Sc in CSE';
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 120),
       children: [
         const Image(
           image: AssetImage('brandings/logo_black.png'),
@@ -95,7 +95,10 @@ class ProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         TextButton.icon(
-          onPressed: () {
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+
+            if (!context.mounted) return;
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
               (route) => false,

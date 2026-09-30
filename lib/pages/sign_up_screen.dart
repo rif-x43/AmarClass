@@ -113,6 +113,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _departmentController = TextEditingController();
+  final _semesterController = TextEditingController();
+  final _yearController = TextEditingController();
+  final _studentIdController = TextEditingController();
+  final _subjectController = TextEditingController();
 
   Widget _signUpField({
     required String label,
@@ -183,6 +188,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _departmentController.dispose();
+    _semesterController.dispose();
+    _yearController.dispose();
+    _studentIdController.dispose();
+    _subjectController.dispose();
     super.dispose();
   }
 
@@ -247,6 +257,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
               ),
+              const SizedBox(height: 16),
+              if (_selectedRole == UserRole.student) ...[
+              _signUpField(
+                label: 'Department',
+                hint: 'e.g. Computer Science and Engineering',
+                controller: _departmentController,
+              ),
+              const SizedBox(height: 16),
+              _signUpField(
+                label: 'Semester',
+                hint: 'e.g. 1st',
+                controller: _semesterController,
+              ),
+              const SizedBox(height: 16),
+              _signUpField(
+                label: 'Year',
+                hint: 'e.g. 1st year',
+                controller: _yearController,
+              ),
+              const SizedBox(height: 16),
+              _signUpField(
+                label: 'Student ID',
+                hint: 'Enter student ID',
+                controller: _studentIdController,
+              ),
+            ] else ...[
+              _signUpField(
+                label: 'Department',
+                hint: 'e.g. Computer Science and Engineering',
+                controller: _departmentController,
+              ),
+              const SizedBox(height: 16),
+              _signUpField(
+                label: 'Subject',
+                hint: 'Enter subject',
+                controller: _subjectController,
+              ),
+            ],
               const SizedBox(height: 16),
               _signUpField(
                 label: 'Password',
