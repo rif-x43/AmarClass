@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'courses_screen.dart';
@@ -18,7 +19,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+  final user = FirebaseAuth.instance.currentUser;
 
+  late final displayName = user?.displayName?.trim();
   final List<String> _pageTitles = [
     'Dashboard',
     'Courses',
@@ -83,10 +86,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 120),
       children: [
-        _buildHeader('Dr. Farhana Rahman', 'Lecturer, Dept. of CSE'),
+        _buildHeader(user?.displayName ?? 'Faculty', 'Lecturer, Dept. of CSE'),
         const SizedBox(height: 28),
-        const Text(
-          'Good evening, Rahman.',
+        Text(
+          'Good Evening, ${user?.displayName ?? 'Faculty'}',
           style: TextStyle(
             fontFamily: 'Inter Display',
             fontSize: 26,
@@ -324,10 +327,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 100),
       children: [
-        _buildHeader('Partho Yag Paul', 'Student, B.Sc in CSE'),
+        _buildHeader(user?.displayName ?? 'Student', 'Student, B.Sc in CSE'),
         const SizedBox(height: 32),
-        const Text(
-          'Good Evening, Paul.',
+        Text(
+          'Good Evening, ${user?.displayName ?? 'Student'}',
           textAlign: TextAlign.left,
           style: TextStyle(
             fontFamily: 'Inter Display',

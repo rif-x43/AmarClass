@@ -37,7 +37,7 @@ class _TasksScreenState extends State<TasksScreen>
       title: 'DLD Project Submission',
       course: 'CSE 2106',
       due: 'Due Friday',
-      status: 'In progress',
+      status: 'In Progress',
     ),
 
 
