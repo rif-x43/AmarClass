@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import 'dart:ui';
-import 'package:amarclass/pages/user_role.dart';
-import 'package:amarclass/pages/tasks_screen.dart';
-import 'package:amarclass/pages/schedule_screen.dart';
-//import 'package:amarclass/pages/profile_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:amarclass/ProfileScreen.dart';
-import 'package:amarclass/pages/calender.dart';
-=======
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,10 +7,10 @@ import 'profile_screen.dart';
 import 'schedule_screen.dart';
 import 'tasks_screen.dart';
 import 'user_role.dart';
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
 
 class DashboardScreen extends StatefulWidget {
   final UserRole role;
+
   const DashboardScreen({super.key, required this.role});
 
   @override
@@ -31,8 +21,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   final user = FirebaseAuth.instance.currentUser;
 
-<<<<<<< HEAD
-=======
   late final displayName = user?.displayName?.trim();
   final List<String> _pageTitles = [
     'Dashboard',
@@ -42,44 +30,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     'Profile',
   ];
 
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FF),
       body: Stack(
         children: [
-<<<<<<< HEAD
-          // Main Body Content
-          SafeArea(
-            child: _selectedIndex == 0
-                ? _buildDashboardContent()
-                : _selectedIndex == 1
-                ? const TasksScreen()
-                : _selectedIndex == 2
-                //? ScheduleScreen(role: widget.role)
-                ?SimpleCalendar()
-
-                : const ProfileScreen()
-          ),
-
-          // Floating Glassmorphism Navigation Bar
-=======
           SafeArea(child: _buildCurrentPage()),
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-<<<<<<< HEAD
-              child: _buildGlassNavigationBar(),
-=======
               child: FloatingNavBar(
                 selectedIndex: _selectedIndex,
                 onItemSelected: (index) =>
                     setState(() => _selectedIndex = index),
               ),
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
             ),
           ),
         ],
@@ -87,27 +53,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildDashboardContent() {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        24,
-        32,
-        24,
-        100,
-      ), // Bottom padding prevents content hiding behind the nav bar
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Image(
-              image: AssetImage('brandings/logo_black.png'),
-              height: 24,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-=======
   Widget _buildCurrentPage() {
     switch (_selectedIndex) {
       case 0:
@@ -330,53 +275,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Partho Paul',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      'Student, B.Sc in CSE',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 12,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => setState(() => _selectedIndex = 3),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    child: Image(
-                      image: AssetImage('brandings/appicon_blue.png'),
-                      height: 30,
-                      width: 30,
-                    ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    color: Colors.black54,
                   ),
                 ),
               ],
             ),
-<<<<<<< HEAD
-          ],
-        ),
-        const SizedBox(height: 32),
-        Text(
-          'Good Evening, Paul.',
-=======
             const SizedBox(width: 10),
             _NotificationButton(
               onPressed: () => _showMessage('Notifications are coming soon.'),
@@ -414,7 +331,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 32),
         Text(
           'Good Evening, ${user?.displayName ?? 'Student'}',
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
           textAlign: TextAlign.left,
           style: TextStyle(
             fontFamily: 'Inter Display',
@@ -424,60 +340,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
+        const Row(
           children: [
             Expanded(
               child: _StatCard(
                 title: 'Active Courses',
                 value: '4',
-<<<<<<< HEAD
-                color: const Color(0xFF2F8DF6),
-                onTap: () => setState(() => _selectedIndex = 2),
-=======
                 icon: Icons.menu_book_outlined,
                 color: Color(0xFF2F8DF6),
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: _StatCard(
                 title: 'Pending Tasks',
                 value: '2',
                 icon: Icons.assignment_outlined,
                 color: Colors.black87,
-                onTap: () => setState(() => _selectedIndex = 1),
               ),
             ),
           ],
         ),
-<<<<<<< HEAD
-        const SizedBox(height: 40),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Pending Tasks',
-              style: TextStyle(
-                fontFamily: 'Inter Display',
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            TextButton(
-              onPressed: () => setState(() => _selectedIndex = 1),
-              child: const Text(
-                'View all',
-                style: TextStyle(
-                  fontFamily: 'Inter Display',
-                  color: Color(0xFF2F8DF6),
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
-=======
         const SizedBox(height: 32),
         _SectionTitle(
           title: 'Next class',
@@ -497,7 +380,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           title: 'Pending tasks',
           action: 'View all',
           onAction: () => setState(() => _selectedIndex = 2),
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
         ),
         const SizedBox(height: 8),
         const _TaskCard(
@@ -509,10 +391,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           featured: true,
         ),
         const SizedBox(height: 10),
-        Row(
+        const Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Expanded(
+            Expanded(
               child: _TaskCard(
                 courseCode: 'CSE 2105',
                 title: 'Sequential Circuit Design',
@@ -522,14 +404,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 compact: true,
               ),
             ),
-            const SizedBox(width: 10),
-            const Expanded(
+            SizedBox(width: 10),
+            Expanded(
               child: _TaskCard(
                 courseCode: 'MATH 2109',
                 title: 'Laplace Transformation Worksheet',
                 dueText: 'Due Tuesday',
                 progress: 0,
-                status: 'Due',
+                status: 'Not started',
                 compact: true,
               ),
             ),
@@ -546,81 +428,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(height: 16),
-
-        // Sleek Course Cards
-        const _CourseCard(
+        _CourseCard(
           courseCode: 'CSE 2103',
           courseName: 'Data Structures',
           instructor: 'Md. Siam Ansary',
+          onTap: () => _openStudentCourse(
+            code: 'CSE 2103',
+            name: 'Data Structures',
+            instructor: 'Md. Siam Ansary',
+          ),
         ),
         const SizedBox(height: 12),
-        const _CourseCard(
+        _CourseCard(
           courseCode: 'CSE 2105',
           courseName: 'Digital Logic Design',
           instructor: 'Syeda Shabnam Hasan',
+          onTap: () => _openStudentCourse(
+            code: 'CSE 2105',
+            name: 'Digital Logic Design',
+            instructor: 'Syeda Shabnam Hasan',
+          ),
         ),
         const SizedBox(height: 12),
-        const _CourseCard(
+        _CourseCard(
           courseCode: 'MATH 2109',
           courseName: 'Complex Variable, Laplace Transformation and Statistics',
           instructor: 'Md. Ekramul Haque Pathshala',
+          onTap: () => _openStudentCourse(
+            code: 'MATH 2109',
+            name: 'Complex Variable, Laplace Transformation and Statistics',
+            instructor: 'Md. Ekramul Haque Pathshala',
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildGlassNavigationBar() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.7),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-            borderRadius: BorderRadius.circular(32),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.dashboard_outlined,
-                selectedIcon: Icons.dashboard,
-                label: 'Dashboard',
-                isSelected: _selectedIndex == 0,
-                onTap: () => setState(() => _selectedIndex = 0),
-              ),
-              _NavItem(
-                icon: Icons.task_alt_outlined,
-                selectedIcon: Icons.task_alt,
-                label: 'Tasks',
-                isSelected: _selectedIndex == 1,
-                onTap: () => setState(() => _selectedIndex = 1),
-              ),
-              _NavItem(
-                icon: Icons.calendar_month_outlined,
-                selectedIcon: Icons.calendar_month,
-                label: 'Schedule',
-                isSelected: _selectedIndex == 2,
-                onTap: () => setState(() => _selectedIndex = 2),
-              ),
-              _NavItem(
-                icon: Icons.person_outline,
-                selectedIcon: Icons.person,
-                label: 'Profile',
-                isSelected: _selectedIndex == 3,
-                onTap: () => setState(() => _selectedIndex = 3),
-              ),
-            ],
-          ),
+  void _openFacultyCourse({
+    required String code,
+    required String name,
+    required String students,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ClassroomScreen(
+          courseCode: code,
+          courseName: name,
+          instructor: 'Dr. Farhana Rahman',
+          studentCount: students,
+          isFaculty: true,
         ),
       ),
     );
   }
-<<<<<<< HEAD
-=======
 
   void _openStudentCourse({
     required String code,
@@ -961,36 +822,24 @@ class _FacultyInsightCard extends StatelessWidget {
       ),
     );
   }
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
 }
 
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final Color color;
-<<<<<<< HEAD
-  final VoidCallback? onTap;
-=======
   final IconData icon;
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
 
   const _StatCard({
     super.key,
     required this.title,
     required this.value,
     required this.color,
-<<<<<<< HEAD
-    this.onTap,
-=======
     required this.icon,
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
   });
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return GestureDetector(
-=======
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1053,27 +902,17 @@ class _FacultyCourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
       onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.05),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: 0.1)),
+          border: Border.all(color: Colors.black12, width: 0.5),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-<<<<<<< HEAD
-            Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Inter Display',
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: color,
-=======
             Container(
               height: 48,
               width: 48,
@@ -1086,17 +925,44 @@ class _FacultyCourseCard extends StatelessWidget {
                   Icons.menu_book_rounded,
                   color: Color(0xFF2F8DF6),
                 ),
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                fontFamily: 'Inter Display',
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    code,
+                    style: const TextStyle(
+                      fontFamily: 'Inter Display',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2F8DF6),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'Inter Display',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    students,
+                    style: const TextStyle(
+                      fontFamily: 'Inter Display',
+                      fontSize: 12,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -1106,8 +972,6 @@ class _FacultyCourseCard extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
-=======
 class _FacultyTool extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -1140,19 +1004,17 @@ class _FacultyTool extends StatelessWidget {
   }
 }
 
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
 class _CourseCard extends StatelessWidget {
   final String courseCode;
   final String courseName;
   final String instructor;
+  final VoidCallback onTap;
 
   const _CourseCard({
     super.key,
     required this.courseCode,
     required this.courseName,
     required this.instructor,
-<<<<<<< HEAD
-=======
     required this.onTap,
   });
 
@@ -1327,63 +1189,40 @@ class _ClassroomSection extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.detail,
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black12, width: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black12),
       ),
       child: Row(
         children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2F8DF6).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: Icon(Icons.menu_book_rounded, color: Color(0xFF2F8DF6)),
-            ),
-          ),
-          const SizedBox(width: 16),
+          Icon(icon, color: const Color(0xFF2F8DF6)),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  courseCode,
+                  title,
                   style: const TextStyle(
                     fontFamily: 'Inter Display',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2F8DF6),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  courseName,
+                  detail,
                   style: const TextStyle(
                     fontFamily: 'Inter Display',
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  instructor,
-                  style: const TextStyle(
-                    fontFamily: 'Inter Display',
-                    fontSize: 13,
+                    fontSize: 12,
                     color: Colors.black54,
                   ),
                 ),
@@ -1421,12 +1260,6 @@ class _TaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-<<<<<<< HEAD
-        color: featured ? const Color(0xFFEAF3FF) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: featured ? const Color(0xFFB9D8FF) : Colors.black12,
-=======
         color: featured
             ? const Color(0xFF2F8DF6).withOpacity(0.08)
             : Colors.white,
@@ -1435,7 +1268,6 @@ class _TaskCard extends StatelessWidget {
           color: featured
               ? const Color(0xFF2F8DF6).withOpacity(0.25)
               : Colors.black12,
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
         ),
       ),
       child: Column(
@@ -1498,7 +1330,7 @@ class _TaskCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 5,
-              backgroundColor: const Color(0xFFE9EEF7),
+              backgroundColor: Colors.black12,
               valueColor: const AlwaysStoppedAnimation<Color>(
                 Color(0xFF2F8DF6),
               ),
@@ -1509,45 +1341,3 @@ class _TaskCard extends StatelessWidget {
     );
   }
 }
-<<<<<<< HEAD
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2F8DF6).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Icon(
-          isSelected ? selectedIcon : icon,
-          color: isSelected ? const Color(0xFF2F8DF6) : Colors.black45,
-          size: 26,
-        ),
-      ),
-    );
-  }
-}
-=======
->>>>>>> 87de53201054a800337f9b5e9c391a30f2405fb6
