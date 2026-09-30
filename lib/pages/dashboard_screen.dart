@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'courses_screen.dart';
+import 'floating_nav_bar.dart';
 import 'profile_screen.dart';
 import 'schedule_screen.dart';
+import 'tasks_screen.dart';
 import 'user_role.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -18,6 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<String> _pageTitles = [
     'Dashboard',
+    'Courses',
     'Tasks',
     'Schedule',
     'Profile',
@@ -29,32 +33,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: const Color(0xFFF8F8FF),
       body: Stack(
         children: [
-          SafeArea(
-            child: _selectedIndex == 0
-                ? (widget.role == UserRole.faculty
-                      ? _buildFacultyContent()
-                      : _buildDashboardContent())
-                : _selectedIndex == 3
-                ? ProfileScreen(role: widget.role)
-                : _selectedIndex == 2
-                ? ScheduleScreen(role: widget.role)
-                : Center(
-                    child: Text(
-                      _pageTitles[_selectedIndex],
-                      style: const TextStyle(
-                        fontFamily: 'Inter Display',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-          ),
+          SafeArea(child: _buildCurrentPage()),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-              child: _buildNavigationBar(),
+              child: FloatingNavBar(
+                selectedIndex: _selectedIndex,
+                onItemSelected: (index) =>
+                    setState(() => _selectedIndex = index),
+              ),
             ),
           ),
         ],
@@ -62,65 +50,168 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _buildCurrentPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return widget.role == UserRole.faculty
+            ? _buildFacultyContent()
+            : _buildDashboardContent();
+      case 1:
+        return CoursesScreen(role: widget.role);
+      case 2:
+        return const TasksScreen();
+      case 3:
+        return ScheduleScreen(role: widget.role);
+      case 4:
+        return ProfileScreen(role: widget.role);
+      default:
+        return Center(
+          child: Text(
+            _pageTitles[_selectedIndex],
+            style: const TextStyle(
+              fontFamily: 'Inter Display',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        );
+    }
+  }
+
   Widget _buildFacultyContent() {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 100),
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 120),
       children: [
         _buildHeader('Dr. Farhana Rahman', 'Lecturer, Dept. of CSE'),
-        const SizedBox(height: 32),
+        const SizedBox(height: 28),
         const Text(
-          'Good Evening, Rahman.',
+          'Good evening, Rahman.',
           style: TextStyle(
             fontFamily: 'Inter Display',
-            fontSize: 28,
+            fontSize: 26,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Here is your teaching overview for today.',
+          style: TextStyle(
+            fontFamily: 'Inter Display',
+            fontSize: 13,
+            color: Colors.black54,
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                title: 'Active courses',
+                value: '3',
+                icon: Icons.menu_book_outlined,
+                color: Color(0xFF2F8DF6),
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: _StatCard(
+                title: 'Total students',
+                value: '86',
+                icon: Icons.groups_outlined,
+                color: Colors.black87,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         const Row(
           children: [
             Expanded(
               child: _StatCard(
-                title: 'Active Courses',
-                value: '3',
-                color: Color(0xFF2F8DF6),
+                title: 'Pending reviews',
+                value: '12',
+                icon: Icons.assignment_late_outlined,
+                color: Color(0xFFE58A25),
               ),
             ),
-            SizedBox(width: 16),
+            SizedBox(width: 12),
             Expanded(
               child: _StatCard(
-                title: 'Total Students',
-                value: '86',
-                color: Colors.black87,
+                title: 'Attendance',
+                value: '91%',
+                icon: Icons.query_stats_outlined,
+                color: Color(0xFF2E9B75),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 40),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Your Courses',
-              style: TextStyle(
-                fontFamily: 'Inter Display',
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add, size: 17),
-              label: const Text('New course'),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF2F8DF6),
-              ),
-            ),
-          ],
+        const SizedBox(height: 32),
+        _SectionTitle(
+          title: 'Today\'s classes',
+          action: 'View schedule',
+          onAction: () => setState(() => _selectedIndex = 3),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        const _FacultyClassCard(
+          time: '09:00 AM',
+          code: 'CSE 1205',
+          title: 'Object Oriented Programming',
+          location: 'Room 402  ·  32 students',
+          active: true,
+        ),
+        const SizedBox(height: 10),
+        const _FacultyClassCard(
+          time: '02:30 PM',
+          code: 'CSE 1203',
+          title: 'Discrete Math',
+          location: 'Room 305  ·  28 students',
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle(
+          title: 'Upcoming classes',
+          action: 'See all',
+          onAction: () => setState(() => _selectedIndex = 3),
+        ),
+        const SizedBox(height: 12),
+        const _UpcomingClassRow(
+          day: 'Tomorrow',
+          time: '10:00 AM',
+          title: 'Structured Programming Language',
+          code: 'CSE 1101',
+        ),
+        const _UpcomingClassRow(
+          day: 'Thu, 14 Mar',
+          time: '09:00 AM',
+          title: 'Object Oriented Programming',
+          code: 'CSE 1205',
+        ),
+        const SizedBox(height: 32),
+        const _SectionTitle(title: 'Teaching insights', action: 'This week'),
+        const SizedBox(height: 12),
+        const _FacultyInsightCard(
+          icon: Icons.fact_check_outlined,
+          title: 'Student attendance',
+          detail: 'CSE 1205 has the highest attendance this week.',
+          value: '94%',
+          color: Color(0xFF2E9B75),
+        ),
+        const SizedBox(height: 10),
+        const _FacultyInsightCard(
+          icon: Icons.assignment_outlined,
+          title: 'Assignment overview',
+          detail: '12 submissions are waiting for your review.',
+          value: '12',
+          color: Color(0xFFE58A25),
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle(
+          title: 'Course management',
+          action: 'Manage',
+          onAction: () => setState(() => _selectedIndex = 1),
+        ),
+        const SizedBox(height: 12),
         _FacultyCourseCard(
           code: 'CSE 1205',
           title: 'Object Oriented Programming',
@@ -153,27 +244,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
             students: '26 students',
           ),
         ),
-        const SizedBox(height: 32),
-        const Text(
-          'Course Tools',
-          style: TextStyle(
-            fontFamily: 'Inter Display',
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
+        const SizedBox(height: 24),
+        const _SectionTitle(title: 'Quick tools'),
         const SizedBox(height: 8),
         const _FacultyTool(
           icon: Icons.fact_check_outlined,
           title: 'Attendance tracking',
         ),
         const _FacultyTool(
-          icon: Icons.cast_for_education_outlined,
-          title: 'Online class',
+          icon: Icons.grading_outlined,
+          title: 'Grade submissions',
         ),
-        const _FacultyTool(icon: Icons.grading_outlined, title: 'Grading'),
-        const _FacultyTool(icon: Icons.draw_outlined, title: 'Whiteboard'),
+        const _FacultyTool(
+          icon: Icons.cast_for_education_outlined,
+          title: 'Start online class',
+        ),
       ],
     );
   }
@@ -207,6 +292,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(width: 10),
+            _NotificationButton(
+              onPressed: () => _showMessage('Notifications are coming soon.'),
+            ),
+            const SizedBox(width: 8),
             Container(
               height: 32,
               width: 32,
@@ -224,6 +313,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     );
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildDashboardContent() {
@@ -249,6 +343,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _StatCard(
                 title: 'Active Courses',
                 value: '4',
+                icon: Icons.menu_book_outlined,
                 color: Color(0xFF2F8DF6),
               ),
             ),
@@ -257,36 +352,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _StatCard(
                 title: 'Pending Tasks',
                 value: '2',
+                icon: Icons.assignment_outlined,
                 color: Colors.black87,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 40),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Pending Tasks',
-              style: TextStyle(
-                fontFamily: 'Inter Display',
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'View all',
-                style: TextStyle(
-                  fontFamily: 'Inter Display',
-                  color: Color(0xFF2F8DF6),
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
+        const SizedBox(height: 32),
+        _SectionTitle(
+          title: 'Next class',
+          action: 'View schedule',
+          onAction: () => setState(() => _selectedIndex = 3),
+        ),
+        const SizedBox(height: 12),
+        const _FacultyClassCard(
+          time: '11:00 AM',
+          code: 'CSE 2103',
+          title: 'Data Structures',
+          location: 'Room 201  ·  Starts in 45 min',
+          active: true,
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle(
+          title: 'Pending tasks',
+          action: 'View all',
+          onAction: () => setState(() => _selectedIndex = 2),
         ),
         const SizedBox(height: 8),
         const _TaskCard(
@@ -406,42 +496,324 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+}
 
-  Widget _buildNavigationBar() {
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    super.key,
+    required this.title,
+    this.action,
+    this.onAction,
+  });
+
+  final String title;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontFamily: 'Inter Display',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        if (action != null)
+          TextButton(
+            onPressed: onAction,
+            child: Text(
+              action!,
+              style: const TextStyle(
+                fontFamily: 'Inter Display',
+                fontSize: 12,
+                color: Color(0xFF2F8DF6),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _NotificationButton extends StatelessWidget {
+  const _NotificationButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        IconButton(
+          tooltip: 'Notifications',
+          onPressed: onPressed,
+          style: IconButton.styleFrom(
+            backgroundColor: const Color(0xFFF3F8FF),
+            foregroundColor: const Color(0xFF2F8DF6),
+            fixedSize: const Size(36, 36),
+            padding: EdgeInsets.zero,
+          ),
+          icon: const Icon(Icons.notifications_none_outlined, size: 20),
+        ),
+        Positioned(
+          top: 2,
+          right: 2,
+          child: Container(
+            height: 8,
+            width: 8,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE56B6F),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FacultyClassCard extends StatelessWidget {
+  const _FacultyClassCard({
+    super.key,
+    required this.time,
+    required this.code,
+    required this.title,
+    required this.location,
+    this.active = false,
+  });
+
+  final String time;
+  final String code;
+  final String title;
+  final String location;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 64,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: active
+            ? const Color(0xFF2F8DF6).withOpacity(0.06)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: active
+              ? const Color(0xFF2F8DF6).withOpacity(0.2)
+              : Colors.black12,
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(
+              time,
+              style: const TextStyle(
+                fontFamily: 'Inter Display',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          Container(width: 1, height: 42, color: Colors.black12),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  code,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2F8DF6),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  location,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (active)
+            const Icon(
+              Icons.play_circle_outline,
+              color: Color(0xFF2F8DF6),
+              size: 22,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UpcomingClassRow extends StatelessWidget {
+  const _UpcomingClassRow({
+    super.key,
+    required this.day,
+    required this.time,
+    required this.title,
+    required this.code,
+  });
+
+  final String day;
+  final String time;
+  final String title;
+  final String code;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 82,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  day,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  time,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  code,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    color: Color(0xFF2F8DF6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: Colors.black26),
+        ],
+      ),
+    );
+  }
+}
+
+class _FacultyInsightCard extends StatelessWidget {
+  const _FacultyInsightCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.detail,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String title;
+  final String detail;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(32),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _NavItem(
-            icon: Icons.dashboard_outlined,
-            selectedIcon: Icons.dashboard,
-            isSelected: _selectedIndex == 0,
-            onTap: () => setState(() => _selectedIndex = 0),
+          Icon(icon, color: color, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    fontFamily: 'Inter Display',
+                    fontSize: 11,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
           ),
-          _NavItem(
-            icon: Icons.task_alt_outlined,
-            selectedIcon: Icons.task_alt,
-            isSelected: _selectedIndex == 1,
-            onTap: () => setState(() => _selectedIndex = 1),
-          ),
-          _NavItem(
-            icon: Icons.calendar_month_outlined,
-            selectedIcon: Icons.calendar_month,
-            isSelected: _selectedIndex == 2,
-            onTap: () => setState(() => _selectedIndex = 2),
-          ),
-          _NavItem(
-            icon: Icons.person_outline,
-            selectedIcon: Icons.person,
-            isSelected: _selectedIndex == 3,
-            onTap: () => setState(() => _selectedIndex = 3),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Inter Display',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -453,30 +825,43 @@ class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final Color color;
+  final IconData icon;
 
   const _StatCard({
+    super.key,
     required this.title,
     required this.value,
     required this.color,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            height: 30,
+            width: 30,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 17),
+          ),
+          const SizedBox(height: 14),
           Text(
             value,
             style: TextStyle(
               fontFamily: 'Inter Display',
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -504,6 +889,7 @@ class _FacultyCourseCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _FacultyCourseCard({
+    super.key,
     required this.code,
     required this.title,
     required this.students,
@@ -528,11 +914,14 @@ class _FacultyCourseCard extends StatelessWidget {
               height: 48,
               width: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF2F8DF6),
+                color: const Color(0xFFEAF3FF),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Center(
-                child: Icon(Icons.menu_book_rounded, color: Color(0xFF2F8DF6)),
+                child: Icon(
+                  Icons.menu_book_rounded,
+                  color: Color(0xFF2F8DF6),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -584,7 +973,7 @@ class _FacultyTool extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _FacultyTool({required this.icon, required this.title});
+  const _FacultyTool({super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -619,6 +1008,7 @@ class _CourseCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _CourseCard({
+    super.key,
     required this.courseCode,
     required this.courseName,
     required this.instructor,
@@ -643,11 +1033,14 @@ class _CourseCard extends StatelessWidget {
               height: 48,
               width: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF2F8DF6),
+                color: const Color(0xFFEAF3FF),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Center(
-                child: Icon(Icons.menu_book_rounded, color: Color(0xFF2F8DF6)),
+                child: Icon(
+                  Icons.menu_book_rounded,
+                  color: Color(0xFF2F8DF6),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -789,6 +1182,7 @@ class _ClassroomSection extends StatelessWidget {
   final String detail;
 
   const _ClassroomSection({
+    super.key,
     required this.icon,
     required this.title,
     required this.detail,
@@ -848,6 +1242,7 @@ class _TaskCard extends StatelessWidget {
   final bool compact;
 
   const _TaskCard({
+    super.key,
     required this.courseCode,
     required this.title,
     required this.dueText,
@@ -863,12 +1258,12 @@ class _TaskCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: featured
-            ? const Color(0xFF2F8DF6).withValues(alpha: 0.08)
+            ? const Color(0xFF2F8DF6).withOpacity(0.08)
             : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: featured
-              ? const Color(0xFF2F8DF6).withValues(alpha: 0.25)
+              ? const Color(0xFF2F8DF6).withOpacity(0.25)
               : Colors.black12,
         ),
       ),
@@ -939,42 +1334,6 @@ class _TaskCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData selectedIcon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2F8DF6).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Icon(
-          isSelected ? selectedIcon : icon,
-          color: isSelected ? const Color(0xFF2F8DF6) : Colors.black45,
-          size: 26,
-        ),
       ),
     );
   }

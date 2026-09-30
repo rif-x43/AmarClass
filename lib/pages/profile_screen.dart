@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'login_screen.dart';
@@ -11,7 +12,12 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFaculty = role == UserRole.faculty;
-    final name = isFaculty ? 'Dr. Farhana Rahman' : 'Partho Yag Paul';
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName?.trim();
+    final name = displayName != null && displayName.isNotEmpty
+      ? displayName
+      : 'User';
+    final email = user?.email ?? 'Email unavailable';
     final subtitle = isFaculty
         ? 'Faculty · Computer Science'
         : 'Student · B.Sc in CSE';
@@ -54,9 +60,7 @@ class ProfileScreen extends StatelessWidget {
             _ProfileItem(
               icon: Icons.email_outlined,
               label: 'Institutional email',
-              value: isFaculty
-                  ? 'farhana.rahman@aust.edu'
-                  : 'partho.yag@aust.edu',
+              value: email,
             ),
             _ProfileItem(
               icon: Icons.badge_outlined,
