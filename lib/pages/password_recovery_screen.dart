@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'otp_verification_screen.dart';
-import 'user_role.dart';
 
 class PasswordRecoveryScreen extends StatelessWidget {
-  final UserRole role;
-
-  const PasswordRecoveryScreen({super.key, required this.role});
+  const PasswordRecoveryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +66,7 @@ class PasswordRecoveryScreen extends StatelessWidget {
                 style: TextStyle(fontFamily: 'Inter Display', fontSize: 15),
                 cursorColor: Color(0xFF2F8DF6),
                 decoration: InputDecoration(
-                  hintText: 'partho.yag@aust.edu',
+                  hintText: 'john.doe@aust.edu',
                   hintStyle: TextStyle(color: Colors.black26),
                   filled: true,
                   fillColor: Colors.white,
@@ -102,7 +99,11 @@ class PasswordRecoveryScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Sorry, server busy at the moment'),
+                    ),
+                  ),
                   child: const Text(
                     'Send Reset Link',
                     style: TextStyle(
@@ -116,14 +117,12 @@ class PasswordRecoveryScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => OtpVerificationScreen(role: role),
-                      ),
-                    );
-                  },
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const OtpVerificationScreen(),
+                    ),
+                  ),
                   child: const Text(
                     'Login with OTP',
                     style: TextStyle(

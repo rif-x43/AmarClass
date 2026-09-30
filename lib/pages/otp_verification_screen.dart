@@ -2,14 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'dashboard_screen.dart';
-import 'user_role.dart';
-
 class OtpVerificationScreen extends StatefulWidget {
-  final UserRole role;
-
-  const OtpVerificationScreen({super.key, required this.role});
-
+  const OtpVerificationScreen({super.key});
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
@@ -63,23 +57,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     super.dispose();
   }
 
-  void _verifyAndProceed() {
-    String otpCode = _controllers.map((c) => c.text).join();
+  void _showServerBusy() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sorry, server busy at the moment')),
+    );
+  }
 
-    if (otpCode.length == 6) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => DashboardScreen(role: widget.role)),
-      );
-    }
+  void _verifyAndProceed() {
+    _showServerBusy();
   }
 
   void _resendCode() {
-    for (var controller in _controllers) {
-      controller.clear();
-    }
-    _focusNodes[0].requestFocus();
-    _startCountdown();
+    _showServerBusy();
   }
 
   @override

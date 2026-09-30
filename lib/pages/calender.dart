@@ -37,13 +37,6 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
   DateTime? selectDate;
 
 
-  Map<DateTime, List<String>> taskTitles = {};
-  Map<DateTime, List<String>> taskDescs = {};
-
- 
-  final titleController = TextEditingController();
-  final descController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -89,11 +82,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Tasks:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  // IconButton(
-                  //   icon: const Icon(Icons.add_circle, color: Colors.blue, size: 32),
-                  //   onPressed: () => openBox(),
-                  // ),
+                  const Text('Tasks:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                 ],
               ),
             ),

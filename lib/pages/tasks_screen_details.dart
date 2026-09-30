@@ -16,23 +16,28 @@ class TaskDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Task Details'),
       ),
-      body: Column(
-        children:[
-          Text(task.title),
-          Text(task.course),
-          Text(task.due),
-          Text(task.status),
-
-
-          ElevatedButton(
-            onPressed: () {
-
-                task.isDone = true;
-                task.status = 'DONE!';
-            },
-            child: const Text('Complete Task'),
-          ),
-        ],
+      body: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            children: [
+              Text(task.title),
+              Text(task.course),
+              Text(task.due),
+              Text(task.status),
+              ElevatedButton(
+                onPressed: task.isDone
+                    ? null
+                    : () {
+                      setState(() {
+                        task.isDone = true;
+                        task.status = 'DONE!';
+                      });
+                    },
+                child: Text(task.isDone ? 'DONE!' : 'Complete Task'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

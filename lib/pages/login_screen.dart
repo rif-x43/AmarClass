@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dashboard_screen.dart';
 import 'password_recovery_screen.dart';
@@ -13,10 +16,40 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const _rememberedEmailKey = 'remembered_email';
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedEmail();
+  }
+
+  Future<void> _loadRememberedEmail() async {
+    final preferences = await SharedPreferences.getInstance();
+    final email = preferences.getString(_rememberedEmailKey);
+
+    if (!mounted || email == null || email.isEmpty) return;
+
+    setState(() {
+      _emailController.text = email;
+      _rememberMe = true;
+    });
+  }
+
+  Future<void> _saveRememberedEmail(String email) async {
+    final preferences = await SharedPreferences.getInstance();
+
+    if (_rememberMe) {
+      await preferences.setString(_rememberedEmailKey, email);
+    } else {
+      await preferences.remove(_rememberedEmailKey);
+    }
+  }
 
   @override
   void dispose() {
@@ -25,23 +58,104 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _signIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    UserRole? role;
 
-    if (email == 'test@aust.edu' && password == 'test') {
-      role = UserRole.student;
-    } else if (email == 'test2@aust.edu' && password == 'test2') {
-      role = UserRole.faculty;
-    }
-
-    if (role != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => DashboardScreen(role: role!)),
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
+
+      final user = credential.user;
+      if (user == null) return;
+
+      await _saveRememberedEmail(email);
+      await _goToDashboard(user);
+    } on FirebaseAuthException catch (error) {
+      _showMessage(error.message ?? 'Login failed');
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Database error');
     }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final provider = GoogleAuthProvider();
+
+      final credential = await FirebaseAuth.instance.signInWithPopup(provider);
+
+      final user = credential.user;
+      if (user == null) return;
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        await FirebaseAuth.instance.signOut();
+        _showMessage(
+          'No account found. Please sign up first and choose a role.',
+        );
+        return;
+      }
+
+      await _saveRememberedEmail(user.email ?? '');
+      await _goToDashboard(user);
+    } on FirebaseAuthException catch (error) {
+      _showMessage(error.message ?? 'Google login failed');
+    } on FirebaseException catch (error) {
+      _showMessage(error.message ?? 'Database error');
+    }
+  }
+
+  UserRole? _roleFromValue(Object? value) {
+    switch (value) {
+      case 'student':
+        return UserRole.student;
+      case 'faculty':
+        return UserRole.faculty;
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _openPasswordRecovery() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
+    );
+  }
+
+  Future<void> _goToDashboard(User user) async {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    final role = _roleFromValue(userDoc.data()?['role']);
+
+    if (role == null) {
+      if (!mounted) return;
+
+      _showMessage('User role not found');
+      return;
+    }
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => DashboardScreen(role: role)),
+    );
   }
 
   @override
@@ -84,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               _CustomTextField(
                 label: 'Institutional Email Address',
-                hint: 'partho.yag@aust.edu',
+                hint: 'john.doe@aust.edu',
                 controller: _emailController,
               ),
               const SizedBox(height: 20),
@@ -139,16 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PasswordRecoveryScreen(
-                          role: _emailController.text.trim() == 'test2@aust.edu'
-                              ? UserRole.faculty
-                              : UserRole.student,
-                        ),
-                      ),
-                    ),
+                    onPressed: _openPasswordRecovery,
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
@@ -207,7 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.black87,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: _signInWithGoogle,
                 ),
               ),
               const SizedBox(height: 32),
@@ -250,14 +355,14 @@ class _LoginScreenState extends State<LoginScreen> {
 class _CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final bool obscureText;
   final Widget? suffixIcon;
 
   const _CustomTextField({
     required this.label,
     required this.hint,
-    this.controller,
+    required this.controller,
     this.obscureText = false,
     this.suffixIcon,
   });
